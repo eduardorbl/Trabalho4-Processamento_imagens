@@ -13,7 +13,7 @@ def process_and_display_image(input_image_path, show_on_screen=False):
         show_on_screen (bool): Whether to display the images on the screen. Default is False.
     """
     # Read colored image
-    colored_image = cv2.imread(input_image_path)  # RGB
+    colored_image = cv2.imread(input_image_path)  # BGR format by default
 
     # Convert from BGR to RGB for correct visualization with matplotlib
     rgb_image = cv2.cvtColor(colored_image, cv2.COLOR_BGR2RGB)
@@ -37,6 +37,7 @@ def process_and_display_image(input_image_path, show_on_screen=False):
 
     # Display the images if requested
     if show_on_screen:
+        plt.figure(figsize=(10, 5))  # Adjust figure size to reduce excess space
         plt.subplot(1, 2, 1)
         plt.imshow(rgb_image)
         plt.title('Colored Image')
@@ -46,13 +47,14 @@ def process_and_display_image(input_image_path, show_on_screen=False):
         plt.imshow(bw_image, cmap='gray')
         plt.title('Monochrome Image')
         plt.axis('off')
-
+        
+        plt.tight_layout(rect=[0, 0, 1, 1])  # Adjust layout to minimize extra space
         plt.show()
 
 # Example usage
 if __name__ == "__main__":
     input_image_path = 'imgs/objetos1.png'  # Path to the input image
-    process_and_display_image(input_image_path, show_on_screen=False)
+    process_and_display_image(input_image_path, show_on_screen=True)
     input_image_path = 'imgs/objetos2.png' 
     process_and_display_image(input_image_path, show_on_screen=False)
     input_image_path = 'imgs/objetos3.png'

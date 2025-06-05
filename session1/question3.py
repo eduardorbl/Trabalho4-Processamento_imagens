@@ -59,6 +59,7 @@ def process_and_display_image(image_path, show_image=True, colored_image_path=No
 
     # Display the image if requested
     if show_image:
+        plt.figure(figsize=(10, 5))
         plt.imshow(io.imread(output_image_path))
         plt.title("Numerized Regions")
         plt.axis('off')
@@ -74,4 +75,4 @@ if __name__ == "__main__":
     process_and_display_image(input_image_path, show_image=False, colored_image_path='imgs/objetos2.png')
 
     input_image_path = 'imgs1_output/objetos3_bw.png'
-    process_and_display_image(input_image_path, show_image=False, colored_image_path='imgs/objetos3.png')
+    process_and_display_image(input_image_path, show_image=True, colored_image_path='imgs/objetos3.png')

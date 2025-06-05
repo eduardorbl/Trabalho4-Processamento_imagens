@@ -48,11 +48,11 @@ def extract_object_contours(image_path, structure_size=3, visualize=False, outpu
 
     # Visualize if requested
     if visualize:
-        plt.figure(figsize=(8, 8))
+        plt.figure(figsize=(10, 5))
         plt.imshow(borda, cmap='gray')
         plt.title('Contornos dos Objetos', fontsize=16)
         plt.axis('off')
-        plt.tight_layout()
+        plt.tight_layout(rect=[0, 0, 1, 1])
         plt.show()
 
 if __name__ == "__main__":
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     extract_object_contours(input_image_path, visualize=False)
     
     input_image_path = 'imgs1_output/objetos2_bw.png'
-    extract_object_contours(input_image_path, visualize=False)
+    extract_object_contours(input_image_path, visualize=True)
     
     input_image_path = 'imgs1_output/objetos3_bw.png'
     extract_object_contours(input_image_path, visualize=False)

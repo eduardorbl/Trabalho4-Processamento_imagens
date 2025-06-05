@@ -53,7 +53,7 @@ def analyze_image_regions(image_path):
 
 if __name__ == "__main__":
     # Example usage
-    analyze_image_regions('imgs1_output/objetos1_bw.png')
-    analyze_image_regions('imgs1_output/objetos2_bw.png')
+    #analyze_image_regions('imgs1_output/objetos1_bw.png')
+    #analyze_image_regions('imgs1_output/objetos2_bw.png')
     analyze_image_regions('imgs1_output/objetos3_bw.png')
 

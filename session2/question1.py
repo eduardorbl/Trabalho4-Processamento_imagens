@@ -64,27 +64,23 @@ def nearest_interpolation(img, x_rel, y_rel):
     y_nn = np.clip(y_nn, 0, h - 1)
     return img[y_nn, x_nn]
 
-def process_images(input_folder, output_folder, scale=2.25, display=False):
+def process_images(image_paths, output_folder, scale=2.25, display=False):
     """
-    Reads images from the input folder, scales them using nearest neighbor interpolation,
+    Reads images from the provided file paths, scales them using nearest neighbor interpolation,
     saves the scaled images and their comparison grid to the output folder, and optionally displays them.
 
     Parameters:
-        input_folder (str): folder containing input images
-        output_folder (str): folder to save scaled images
-        scale (float): scaling factor
-        display (bool): whether to display the images
+        image_paths (list): List of image file paths.
+        output_folder (str): Folder to save scaled images.
+        scale (float): Scaling factor.
+        display (bool): Whether to display the images.
     """
     # Create output folder if it doesn't exist
     os.makedirs(output_folder, exist_ok=True)
 
-    # Get list of image files in the input folder
-    image_files = [f for f in os.listdir(input_folder) if f.endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff'))]
-
-    for image_file in image_files:
+    for image_path in image_paths:
         # Read the image
-        input_path = os.path.join(input_folder, image_file)
-        image = io.imread(input_path)
+        image = io.imread(image_path)
 
         # Scale the image
         height_in, width_in = image.shape[:2]
@@ -137,7 +133,7 @@ def process_images(input_folder, output_folder, scale=2.25, display=False):
             ax.set_yticklabels([])
             ax.grid(color='black', linestyle=':', linewidth=0.5)
 
-        grid_output_path = os.path.join(output_folder, f"grid_{image_file}")
+        grid_output_path = os.path.join(output_folder, f"grid_{os.path.basename(image_path)}")
         plt.savefig(grid_output_path)
         if display:
             plt.show()
@@ -146,8 +142,10 @@ def process_images(input_folder, output_folder, scale=2.25, display=False):
 
 # Example usage:
 if __name__ == "__main__":
-    input_folder = "imgs"
+    image_paths = [
+        "imgs/monalisa.png"
+    ]
     output_folder = "imgs2_output"
     scale = 0.8
-    display = False
-    process_images(input_folder=input_folder, output_folder=output_folder, scale=scale, display=display)
+    display = True
+    process_images(image_paths=image_paths, output_folder=output_folder, scale=scale, display=display)

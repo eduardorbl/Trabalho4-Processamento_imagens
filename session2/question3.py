@@ -90,14 +90,14 @@ def bicubic_interpolation(image_rgb, x_rel, y_rel):
 
     return np.clip(result, 0, 255).astype(np.uint8)
 
-def process_images_bicubic(input_folder, output_folder, scale=2.25, display=False):
+def process_image_bicubic(image_path, output_folder, scale=2.25, display=False):
     """
-    Processes images from the input folder by scaling them using bicubic interpolation 
-    and saves the results in the output folder. Optionally displays the comparison 
+    Processes a single image by scaling it using bicubic interpolation 
+    and saves the result in the output folder. Optionally displays the comparison 
     between the resized original and bicubic scaled images.
 
     Args:
-        input_folder (str): Path to the folder containing input images.
+        image_path (str): Path to the input image file.
         output_folder (str): Path to the folder where processed images will be saved.
         scale (float, optional): Scaling factor for bicubic interpolation. Default is 2.25.
         display (bool, optional): If True, displays the comparison plot. Default is False.
@@ -113,59 +113,55 @@ def process_images_bicubic(input_folder, output_folder, scale=2.25, display=Fals
           it is closed after saving.
     """
     os.makedirs(output_folder, exist_ok=True)
-    image_files = [f for f in os.listdir(input_folder) if f.endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff'))]
+    image = io.imread(image_path)
+    image_rgb = to_rgb(image)
 
-    for image_file in image_files:
-        input_path = os.path.join(input_folder, image_file)
-        image = io.imread(input_path)
-        image_rgb = to_rgb(image)
+    height_in, width_in = image_rgb.shape[:2]
+    height_out = int(height_in * scale)
+    width_out = int(width_in * scale)
 
-        height_in, width_in = image_rgb.shape[:2]
-        height_out = int(height_in * scale)
-        width_out = int(width_in * scale)
+    y_out, x_out = np.meshgrid(np.arange(height_out), np.arange(width_out), indexing='ij')
+    y_rel = (y_out - height_out / 2) / scale + height_in / 2
+    x_rel = (x_out - width_out / 2) / scale + width_in / 2
 
-        y_out, x_out = np.meshgrid(np.arange(height_out), np.arange(width_out), indexing='ij')
-        y_rel = (y_out - height_out / 2) / scale + height_in / 2
-        x_rel = (x_out - width_out / 2) / scale + width_in / 2
+    scaled_image = bicubic_interpolation(image_rgb, x_rel, y_rel)
 
-        scaled_image = bicubic_interpolation(image_rgb, x_rel, y_rel)
+    resized_img = (
+        center_image_on_canvas(image, height_out, width_out)
+        if scale > 1
+        else to_rgb(image)
+    )
 
-        resized_img = (
-            center_image_on_canvas(image, height_out, width_out)
-            if scale > 1
-            else to_rgb(image)
-        )
+    H = max(resized_img.shape[0], scaled_image.shape[0])
+    W = max(resized_img.shape[1], scaled_image.shape[1])
+    padded_resized = center_image_on_canvas(resized_img, H, W)
+    padded_scaled = center_image_on_canvas(scaled_image, H, W)
 
-        H = max(resized_img.shape[0], scaled_image.shape[0])
-        W = max(resized_img.shape[1], scaled_image.shape[1])
-        padded_resized = center_image_on_canvas(resized_img, H, W)
-        padded_scaled = center_image_on_canvas(scaled_image, H, W)
+    fig, axes = plt.subplots(1, 2, figsize=(12, 6), constrained_layout=True)
+    axes[0].imshow(padded_resized)
+    axes[0].set_title("Resized Original")
+    axes[1].imshow(padded_scaled)
+    axes[1].set_title(f"Bicubic Scaled (Scale {scale}x)")
 
-        fig, axes = plt.subplots(1, 2, figsize=(12, 6), constrained_layout=True)
-        axes[0].imshow(padded_resized)
-        axes[0].set_title("Resized Original")
-        axes[1].imshow(padded_scaled)
-        axes[1].set_title(f"Bicubic Scaled (Scale {scale}x)")
+    for ax in axes:
+        ax.set_xticks(np.arange(0, W, 50))
+        ax.set_yticks(np.arange(0, H, 50))
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.grid(color='black', linestyle=':', linewidth=0.5)
+        ax.axis('on')
 
-        for ax in axes:
-            ax.set_xticks(np.arange(0, W, 50))
-            ax.set_yticks(np.arange(0, H, 50))
-            ax.set_xticklabels([])
-            ax.set_yticklabels([])
-            ax.grid(color='black', linestyle=':', linewidth=0.5)
-            ax.axis('on')
-
-        grid_output_path = os.path.join(output_folder, f"grid_bicubic_{image_file}")
-        plt.savefig(grid_output_path)
-        if display:
-            plt.show()
-        else:
-            plt.close()
+    grid_output_path = os.path.join(output_folder, f"grid_bicubic_{os.path.basename(image_path)}")
+    plt.savefig(grid_output_path)
+    if display:
+        plt.show()
+    else:
+        plt.close()
 
 # Uso:
 if __name__ == "__main__":
-    input_folder = "imgs"
+    image_path = "imgs/monalisa.png"
     output_folder = "imgs2_output"
-    scale = 0.5
-    display = False
-    process_images_bicubic(input_folder=input_folder, output_folder=output_folder, scale=scale, display=display)
+    scale = 3.2
+    display = True
+    process_image_bicubic(image_path=image_path, output_folder=output_folder, scale=scale, display=display)
